@@ -43,30 +43,42 @@ public class CheckersMain {
        String[] stringArr;
        char player;
        int orig, intend;
+       int loopagain;
        
-       System.out.print("Enter You're move (Eg:B,12,16): ");
-       input = readIn.nextLine();
-       stringArr = input.split(",");
-       player = stringArr[0].charAt(0);
-       player = Character.toUpperCase(player);
-       orig = Integer.parseInt(stringArr[1]);
-       intend = Integer.parseInt(stringArr[2]);
-       if(player != 'W' && player != 'B')
-       {
-           System.out.print("Player select error");
-           return null;
-       }
-       if(!tempBoard.isBoardSpace(orig))
-       {
-           System.out.print("From location error");
-           return null;
-       }
-       if(!tempBoard.isBoardSpace(intend))
-       {
-           System.out.print("to location error");
-           return null;
-       }
-       return input;
+        do{
+       
+            loopagain = 1;
+       
+            System.out.print("Enter You're move (Eg:B,12,16): ");
+            input = readIn.nextLine();
+            stringArr = input.split(",");
+            player = stringArr[0].charAt(0);
+            player = Character.toUpperCase(player);
+            orig = Integer.parseInt(stringArr[1]);
+            intend = Integer.parseInt(stringArr[2]);
+       
+            if(player != 'W' && player != 'B')
+            {
+                System.out.print("Player select error");
+                loopagain = 0;
+                return null;
+            }
+            if(!tempBoard.isBoardSpace(orig))
+            {
+                System.out.print("From location error");
+                loopagain = 0;
+                return null;
+            }
+            if(!tempBoard.isBoardSpace(intend))
+            {
+                 System.out.print("to location error");
+                 loopagain = 0;
+                 return null;
+            }
+       
+            }while(loopagain < 0);
+       
+    return input;
     }
     
     private static void menu(){
