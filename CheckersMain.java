@@ -49,7 +49,7 @@ public class CheckersMain {
        
             loopagain = 1;
        
-            System.out.print("Enter You're move (Eg:B,12,16): ");
+            System.out.println("Enter You're move (Eg:B,12,16): ");
             input = readIn.nextLine();
             stringArr = input.split(",");
             player = stringArr[0].charAt(0);
@@ -57,21 +57,35 @@ public class CheckersMain {
             orig = Integer.parseInt(stringArr[1]);
             intend = Integer.parseInt(stringArr[2]);
        
+            if(input.charAt(1) != ',')
+            {
+                System.out.println("Incorrect Input missing comma");
+                loopagain = 0;
+                return null;
+            }
+            
+            if(input.length() > 7)
+            {
+                System.out.println("Incorrect Input too long");
+                loopagain = 0;
+                return null;
+            }
+            
             if(player != 'W' && player != 'B')
             {
-                System.out.print("Player select error");
+                System.out.println("Player select error");
                 loopagain = 0;
                 return null;
             }
             if(!tempBoard.isBoardSpace(orig))
             {
-                System.out.print("From location error");
+                System.out.println("From location error");
                 loopagain = 0;
                 return null;
             }
             if(!tempBoard.isBoardSpace(intend))
             {
-                 System.out.print("to location error");
+                 System.out.println("to location error");
                  loopagain = 0;
                  return null;
             }
