@@ -27,12 +27,12 @@ public class Board {
                     {
                         this.board[i][j] = ' ';
                     }else{
-                        this.board[i][j] = 'W';
+                        this.board[i][j] = '+';
                     }
                 }else if(i < 3){
                     if(j%2 == 0)
                     {
-                        this.board[i][j] = 'W';
+                        this.board[i][j] = '+';
                     }else{
                         this.board[i][j] = ' ';
                     }
@@ -41,12 +41,12 @@ public class Board {
                     {
                         this.board[i][j] = ' ';
                     }else{
-                        this.board[i][j] = 'B';
+                        this.board[i][j] = 'O';
                     }
                 }else if(i > 4){
                     if(j%2 == 0)
                     {
-                        this.board[i][j] = 'B';
+                        this.board[i][j] = 'O';
                     }else{
                         this.board[i][j] = ' ';
                     }
@@ -58,164 +58,468 @@ public class Board {
     }  
     
     //check all rules and determine if the player has entered a valid move.
-    public boolean validateMove(String input) {
+        public boolean validateMove(String input) {
        
         char player;
+        boolean valid = false;
         int orig, intend;
         String[] inputArr;
         piece = ' ';
+        
         
         inputArr = input.split(",");
         player = inputArr[0].charAt(0);
         orig = Integer.parseInt(inputArr[1]);
         intend = Integer.parseInt(inputArr[2]);
         
+        CustomIndex original = new CustomIndex(getArrIndex(orig).getFirst(),
+                            getArrIndex(orig).getSecond());
+        CustomIndex intended = new CustomIndex(getArrIndex(intend).getFirst(),
+                            getArrIndex(intend).getSecond());
+        piece = board[original.getFirst()][original.getSecond()];
         
-        //add space that space is black space on the board.
-        CustomIndex fromMove = 
-                new CustomIndex(getArrIndex(orig).getFirst()
-                        ,getArrIndex(orig).getSecond());
-        CustomIndex toMove = 
-                new CustomIndex(getArrIndex(intend).getFirst()
-                        ,getArrIndex(intend).getSecond());
+        System.out.println(bestMove(orig));
         
-        System.out.print("[" + fromMove.getFirst() + "]");
-        System.out.print("[" + fromMove.getSecond() + "]");
-        //set which pieces should be getting moved.
-        if(player == 'B')
-        {
-            //Checks to see if space is occupied by a black piece
-            if(board[fromMove.getFirst()][fromMove.getSecond()] != 'O' 
-                    && board[fromMove.getFirst()][fromMove.getSecond()] != '@')
-            {
-                System.out.print("You do not have a piece in that location.");
-                return false;
-            }else if(true)
-            {
-                //check if a jump move is availble. Look at possible movese.
+        
+        if(intended.getFirst()%2 == 0){
+            if(intended.getSecond() != 7){
+                if(piece == '+' || piece == '#' || piece == '@')
+                {
+                    if(orig - 4 == intend && intend == ' ')
+                    {
+                        valid = true;
+                    }
+                    if(orig - 5 == intend && intend == ' ')
+                    {
+                        valid = true;
+                    }
+                }
+                if(piece == 'O' || piece == '#' || piece == '@')
+                {
+                    if(orig + 4 == intend && intend == ' '){
+                        valid = true;
+                    }
+                    if(orig + 5 == intend && intend == ' '){
+                        valid = true;
+                    }
+                }
+            }else{
+                if(piece == '+' || piece == '#' || piece == '@')
+                {
+                    if(orig - 4 == intend && intend == ' '){
+                        valid = true;
+                    }
+                }
+                if(piece == 'O' || piece == '#' || piece == '@')
+                {
+                    valid = true;
+                }
             }
-        }else
-        {
-            piece = '+';
-            return false;
+        }else{
+            if(original.getSecond() != 0){
+                if(piece == '+' || piece == '#' || piece == '@')
+                {
+                    if(orig - 3 == intend && intend == ' ')
+                    {
+                        valid = true;
+                    }
+                    if(orig - 4 == intend && intend == ' ')
+                    {
+                        valid = true;
+                    }
+                }
+                if(piece == 'O' || piece == '#' || piece == '@')
+                {
+                    if(orig + 4 == intend && intend == ' '){
+                        valid = true;
+                    }
+                    if(orig + 5 == intend && intend == ' '){
+                        valid = true;
+                    }
+                }
+            }else{
+                if(piece == '+' || piece == '#' || piece == '@')
+                {
+                    if(orig - 4 == intend && intend == ' '){
+                        valid = true;
+                    }
+                }
+                if(piece == 'O' || piece == '#' || piece == '@')
+                {
+                    if(orig + 4 == intend && intend == ' ')
+                    {
+                        valid = true;
+                    }
+                }
+            }
         }
-        return true;
+        return valid;
     }
     
     //check for better move.
     private boolean bestMove(int pieceToMove){
-        boolean canJump = false;
-        char orig, opt1, opt2;
         
+        //create an object to store the 2d array index for the piece location passed in.
         CustomIndex origIndex = new CustomIndex(getArrIndex(pieceToMove).getFirst(),
                             getArrIndex(pieceToMove).getSecond());
         
-        orig = board[origIndex.getFirst()][origIndex.getSecond()];
+        //get the char that is stored in the array
+        char currentPiece = board[origIndex.getFirst()][origIndex.getSecond()];
         
-        
-        //Left edge checks
-        if(pieceToMove%4 == 0)
+        if(origIndex.getFirst()%2 == 0)
         {
-            if(orig == '+' && pieceToMove - 9 >=1) // is this a white piece and will it stay on the board if jumps
+            if(currentPiece == '+' || currentPiece == '#')
             {
-                CustomIndex checkIndex = new CustomIndex(getArrIndex(pieceToMove - 4).getFirst(),
-                getArrIndex(pieceToMove - 4).getSecond());
-            
-                opt1 = board[checkIndex.getFirst()][checkIndex.getSecond()]; // check piece diagnal of current piece
-                
-                if(orig != opt1 && opt1 != ' ' && opt1 != toKing(orig)) //if the piece isn't the current piece or a space it must be enemy
+                if(pieceToMove - 9 >= 1) 
                 {
-                    CustomIndex tempIndex = new CustomIndex(getArrIndex(pieceToMove - 9).getFirst(),
-                    getArrIndex(pieceToMove - 9).getSecond());
-                    
-                    char temp = board[tempIndex.getFirst()][tempIndex.getSecond()];//the char in the space the piece needs to land on
-                    
-                    canJump = temp == ' '; //set boolean value as true or false based on weather the space can be jumped to.
-                }else{
-                    canJump = false; //if the piece diagnal of the moving piece is not an enemy, it can not jump.
+                    //get index of first diagnal move a white man can make.
+                    CustomIndex firstMove = new CustomIndex(getArrIndex(pieceToMove - 4).getFirst(),
+                                    getArrIndex(pieceToMove - 4).getSecond());
+                    //get index of first space a white man can jump to.
+                    CustomIndex secondMove = new CustomIndex(getArrIndex(pieceToMove - 7).getFirst(),
+                                    getArrIndex(pieceToMove - 7).getSecond());
+
+                    //get index of first alt diagnal white man can move.
+                    CustomIndex altMove1 = new CustomIndex(getArrIndex(pieceToMove - 5).getFirst(),
+                                    getArrIndex(pieceToMove - 5).getSecond());
+
+                    //get index of first  alt jump white man can make.
+                    CustomIndex altMove2 = new CustomIndex(getArrIndex(pieceToMove - 9).getFirst(),
+                                    getArrIndex(pieceToMove - 9).getSecond());
+
+                    //get characters from the customIndex objects.
+                    char move1 = board[firstMove.getFirst()][firstMove.getSecond()];
+                    char move2 = board[secondMove.getFirst()][secondMove.getSecond()];
+                    char alt1 = board[altMove1.getFirst()][altMove1.getSecond()];
+                    char alt2 = board[altMove2.getFirst()][altMove2.getSecond()];
+
+
+                    //checks to see if 1) piece will not jump off board 2) the piece is an enemy piece.
+                     if(move1 != ' ' && (move1 != toMan(currentPiece) && move1 != toKing(currentPiece)) 
+                            && origIndex.getSecond() != 1)
+                     {
+                         //is there an open spot to land on.
+                         if(move2 == ' '){
+                             return true;
+                         }
+                     }else if(alt1 != ' ' && (alt1 != toMan(currentPiece) && alt1 != toKing(currentPiece))
+                             && origIndex.getSecond() != 7)
+                     {
+                         if(alt2 == ' ')
+                         {
+                             return true;
+                         }
+                     }
                 }
-            }else if(orig == 'O' && pieceToMove + 7 <= 32){
-                CustomIndex checkIndex = new CustomIndex(getArrIndex(pieceToMove + 4).getFirst(),
-                getArrIndex(pieceToMove + 4).getSecond());
-            
-                opt1 = board[checkIndex.getFirst()][checkIndex.getSecond()];
-                
-                if(orig != opt1 && opt1 != ' ')
+
+                if(currentPiece == '#' && pieceToMove + 9 <= 32)
                 {
-                    CustomIndex tempIndex = new CustomIndex(getArrIndex(pieceToMove + 7).getFirst(),
-                    getArrIndex(pieceToMove + 7).getSecond());
-                    
-                    char temp = board[tempIndex.getFirst()][tempIndex.getSecond()];
-                    
-                    return temp == ' ';
-                }else{
-                    return false;
+                    //get index of first diagnal move a white man can make.
+                    CustomIndex wKing1 = new CustomIndex(getArrIndex(pieceToMove + 3).getFirst(),
+                                    getArrIndex(pieceToMove + 3).getSecond());
+                    //get index of first space a white man can jump to.
+                    CustomIndex wKing2 = new CustomIndex(getArrIndex(pieceToMove + 7).getFirst(),
+                                    getArrIndex(pieceToMove + 7).getSecond());
+
+                    //get index of first alt diagnal white man can move.
+                    CustomIndex wKingAlt1 = new CustomIndex(getArrIndex(pieceToMove + 4).getFirst(),
+                                    getArrIndex(pieceToMove + 4).getSecond());
+
+                    //get index of first  alt jump white man can make.
+                    CustomIndex wKingAlt2 = new CustomIndex(getArrIndex(pieceToMove + 9).getFirst(),
+                                    getArrIndex(pieceToMove + 9).getSecond());
+
+                    //get characters from the customIndex objects.
+                    char wKingM1 = board[wKing1.getFirst()][wKing1.getSecond()];
+                    char wKingM2 = board[wKing2.getFirst()][wKing2.getSecond()];
+                    char wKingA1 = board[wKingAlt1.getFirst()][wKingAlt1.getSecond()];
+                    char wKingA2 = board[wKingAlt2.getFirst()][wKingAlt2.getSecond()];
+
+                    if(wKingM1 != ' ' && (wKingM1 != toMan(currentPiece) && wKingM1 != toKing(currentPiece))
+                            && origIndex.getSecond() != 7)
+                     {
+                         //is there an open spot to land on.
+                         if(wKingM2 == ' '){
+                             return true;
+                         }
+                     }else if(wKingA1 != ' ' && (wKingA1 != toMan(currentPiece) && wKingA1 != toKing(currentPiece))
+                             && origIndex.getSecond() != 1)
+                     {
+                         if(wKingA2 == ' ')
+                         {
+                             return true;
+                         }
+                     }
                 }
-            }else if(orig == '#'){
-                if(pieceToMove + 7 <= 32)
-                {
-                    CustomIndex checkIndex = new CustomIndex(getArrIndex(pieceToMove + 4).getFirst(),
-                    getArrIndex(pieceToMove + 4).getSecond());
-            
-                    opt1 = board[checkIndex.getFirst()][checkIndex.getSecond()];
-                
-                    if(orig != opt1 && opt1 != ' ')
-                    {
-                        CustomIndex tempIndex = new CustomIndex(getArrIndex(pieceToMove + 7).getFirst(),
-                        getArrIndex(pieceToMove + 7).getSecond());
-                    
-                        char temp = board[tempIndex.getFirst()][tempIndex.getSecond()];
-                    
-                        if(temp == ' ')
-                        {
-                            return true;
-                        }
-                    }
-                }else if(pieceToMove - 9 >= 1){
-                    CustomIndex checkIndex = new CustomIndex(getArrIndex(pieceToMove - 4).getFirst(),
-                    getArrIndex(pieceToMove - 4).getSecond());
-            
-                    opt1 = board[checkIndex.getFirst()][checkIndex.getSecond()];
-                
-                    if(orig != opt1 && opt1 != ' ')
-                    {
-                        CustomIndex tempIndex = new CustomIndex(getArrIndex(pieceToMove - 9).getFirst(),
-                        getArrIndex(pieceToMove - 9).getSecond());
-                    
-                        char temp = board[tempIndex.getFirst()][tempIndex.getSecond()];
-                    
-                        if(temp == ' ')
-                        {
-                            return true;
-                        }
-                    }else{
-                        return false;
-                    }
-                }
+
+            }else if(currentPiece == 'O' || currentPiece == '@')
+            {
+
+            if(pieceToMove + 9 <= 32)
+            {
+                //get index of first diagnal move a black man can make.
+                CustomIndex firstMove = new CustomIndex(getArrIndex(pieceToMove + 3).getFirst(),
+                                getArrIndex(pieceToMove + 3).getSecond());
+                //get index of first space a black man can jump to.
+                CustomIndex secondMove = new CustomIndex(getArrIndex(pieceToMove + 7).getFirst(),
+                                getArrIndex(pieceToMove + 7).getSecond());
+
+                //get index of first alt diagnal black man can move.
+                CustomIndex altMove1 = new CustomIndex(getArrIndex(pieceToMove + 4).getFirst(),
+                                getArrIndex(pieceToMove + 4).getSecond());
+
+                //get index of first  alt jump black man can make.
+                CustomIndex altMove2 = new CustomIndex(getArrIndex(pieceToMove + 9).getFirst(),
+                                getArrIndex(pieceToMove + 9).getSecond());
+
+                //get characters from the customIndex objects.
+                char bMove1 = board[firstMove.getFirst()][firstMove.getSecond()];
+                char bMove2 = board[secondMove.getFirst()][secondMove.getSecond()];
+                char bAlt1 = board[altMove1.getFirst()][altMove1.getSecond()];
+                char bAlt2 = board[altMove2.getFirst()][altMove2.getSecond()];
+
+                if(bMove1 != ' ' && (bMove1 != toMan(currentPiece) && bMove1 != toKing(currentPiece))
+                        && origIndex.getSecond() != 7)
+                 {
+                     //is there an open spot to land on.
+                     if(bMove2 == ' '){
+                         return true;
+                     }
+                 }else if(bAlt1 != ' ' && (bAlt1 != toMan(currentPiece) && bAlt1 != toKing(currentPiece))
+                         && origIndex.getSecond() != 1)
+                 {
+                     if(bAlt2 == ' ')
+                     {
+                         return true;
+                     }
+                 }
             }
-            
-        }else if(pieceToMove + 4 <= 32 && pieceToMove + 5 <= 32){
-            
-            
-            CustomIndex checkIndex = new CustomIndex(getArrIndex(pieceToMove + 4).getFirst(),
-                            getArrIndex(pieceToMove + 4).getSecond());
-            CustomIndex checkIndex2 = new CustomIndex(getArrIndex(pieceToMove + 5).getFirst(),
-                            getArrIndex(pieceToMove + 5).getSecond());
-            
-            
-            orig = board[origIndex.getFirst()][origIndex.getSecond()];
-            opt1 = board[checkIndex.getFirst()][checkIndex.getSecond()]; // forward to the left
-            opt2 = board[checkIndex2.getFirst()][checkIndex2.getSecond()]; // forward to the right
-            
-            
-            if(orig != opt1 && opt1 != ' ')
+
+            if(currentPiece == '@')
             {
-                return bestMove(pieceToMove + 4);
+                if(pieceToMove - 9 >= 1)
+                {
+
+                    //get index of first diagnal move a black king can make.
+                    CustomIndex bKing1 = new CustomIndex(getArrIndex(pieceToMove - 4).getFirst(),
+                                    getArrIndex(pieceToMove - 4).getSecond());
+                    //get index of first space a black king can jump to.
+                    CustomIndex bKing2 = new CustomIndex(getArrIndex(pieceToMove - 7).getFirst(),
+                                    getArrIndex(pieceToMove - 7).getSecond());
+
+                    //get index of first alt diagnal black king can move.
+                    CustomIndex bKingAlt1 = new CustomIndex(getArrIndex(pieceToMove - 5).getFirst(),
+                                    getArrIndex(pieceToMove - 5).getSecond());
+
+                    //get index of first  alt jump black king can make.
+                    CustomIndex bKingAlt2 = new CustomIndex(getArrIndex(pieceToMove - 9).getFirst(),
+                                    getArrIndex(pieceToMove - 9).getSecond());
+
+                    //get characters from the customIndex objects.
+                    char bKingM1 = board[bKing1.getFirst()][bKing1.getSecond()];
+                    char bKingM2 = board[bKing2.getFirst()][bKing2.getSecond()];
+                    char bKingA1 = board[bKingAlt1.getFirst()][bKingAlt1.getSecond()];
+                    char bKingA2 = board[bKingAlt2.getFirst()][bKingAlt2.getSecond()];
+
+
+                    //checks to see if 1) piece will not jump off board 2) the piece is an enemy piece.
+                    if(bKingM1 != ' ' && (bKingM1 != toMan(currentPiece) && bKingM1 != toKing(currentPiece))
+                            && origIndex.getSecond() != 1)
+                    {
+                    //is there an open spot to land on.
+                    if(bKingM2 == ' '){
+                     return true;
+                    }
+                    }else if(bKingA1 != ' ' && (bKingA1 != toMan(currentPiece) && bKingA1 != toKing(currentPiece))
+                            && origIndex.getSecond() != 7)
+                    {
+                        if(bKingA2 == ' ')
+                        {
+                         return true;
+                        }
+                    }
+                }
             }
         }
-        
-        return true;
+        //determine if the row is odd or even. affecting the diagnal offset
+        }else{
+            if(currentPiece == '+' || currentPiece == '#')
+            {
+                if(pieceToMove - 9 >= 1) 
+                {
+                    //get index of first diagnal move a white man can make.
+                    CustomIndex firstMove = new CustomIndex(getArrIndex(pieceToMove - 3).getFirst(),
+                                    getArrIndex(pieceToMove - 3).getSecond());
+                    //get index of first space a white man can jump to.
+                    CustomIndex secondMove = new CustomIndex(getArrIndex(pieceToMove - 7).getFirst(),
+                                    getArrIndex(pieceToMove - 7).getSecond());
+
+                    //get index of first alt diagnal white man can move.
+                    CustomIndex altMove1 = new CustomIndex(getArrIndex(pieceToMove - 4).getFirst(),
+                                    getArrIndex(pieceToMove - 4).getSecond());
+
+                    //get index of first  alt jump white man can make.
+                    CustomIndex altMove2 = new CustomIndex(getArrIndex(pieceToMove - 9).getFirst(),
+                                    getArrIndex(pieceToMove - 9).getSecond());
+
+                    //get characters from the customIndex objects.
+                    char move1 = board[firstMove.getFirst()][firstMove.getSecond()];
+                    char move2 = board[secondMove.getFirst()][secondMove.getSecond()];
+                    char alt1 = board[altMove1.getFirst()][altMove1.getSecond()];
+                    char alt2 = board[altMove2.getFirst()][altMove2.getSecond()];
+
+
+                    //checks to see if 1) piece will not jump off board 2) the piece is an enemy piece.
+                     if(move1 != ' ' && (move1 != toMan(currentPiece) && move1 != toKing(currentPiece)) 
+                             && origIndex.getSecond() != 0)
+                     {
+                         //is there an open spot to land on.
+                         if(move2 == ' '){
+                             return true;
+                         }
+                     }else if(alt1 != ' ' && (alt1 != toMan(currentPiece) && alt1 != toKing(currentPiece))
+                             && origIndex.getSecond() != 6)
+                     {
+                         if(alt2 == ' ')
+                         {
+                             return true;
+                         }
+                     }
+                }
+
+                if(currentPiece == '#' && pieceToMove + 9 <= 32)
+                {
+                    //get index of first diagnal move a white man can make.
+                    CustomIndex wKing1 = new CustomIndex(getArrIndex(pieceToMove + 4).getFirst(),
+                                    getArrIndex(pieceToMove + 4).getSecond());
+                    //get index of first space a white man can jump to.
+                    CustomIndex wKing2 = new CustomIndex(getArrIndex(pieceToMove + 7).getFirst(),
+                                    getArrIndex(pieceToMove + 7).getSecond());
+
+                    //get index of first alt diagnal white man can move.
+                    CustomIndex wKingAlt1 = new CustomIndex(getArrIndex(pieceToMove + 5).getFirst(),
+                                    getArrIndex(pieceToMove + 5).getSecond());
+
+                    //get index of first  alt jump white man can make.
+                    CustomIndex wKingAlt2 = new CustomIndex(getArrIndex(pieceToMove + 9).getFirst(),
+                                    getArrIndex(pieceToMove + 9).getSecond());
+
+                    //get characters from the customIndex objects.
+                    char wKingM1 = board[wKing1.getFirst()][wKing1.getSecond()];
+                    char wKingM2 = board[wKing2.getFirst()][wKing2.getSecond()];
+                    char wKingA1 = board[wKingAlt1.getFirst()][wKingAlt1.getSecond()];
+                    char wKingA2 = board[wKingAlt2.getFirst()][wKingAlt2.getSecond()];
+
+                    if(wKingM1 != ' ' && (wKingM1 != toMan(currentPiece) && wKingM1 != toKing(currentPiece))
+                            && origIndex.getSecond() != 6)
+                     {
+                         //is there an open spot to land on.
+                         if(wKingM2 == ' '){
+                             return true;
+                         }
+                     }else if(wKingA1 != ' ' && (wKingA1 != toMan(currentPiece) && wKingA1 != toKing(currentPiece)) 
+                             && origIndex.getSecond() != 0)
+                     {
+                         if(wKingA2 == ' ')
+                         {
+                             return true;
+                         }
+                     }
+                }
+            }else if(currentPiece == 'O' || currentPiece == '@')
+            {
+
+            if(pieceToMove + 9 <= 32)
+            {
+                //get index of first diagnal move a black man can make.
+                CustomIndex firstMove = new CustomIndex(getArrIndex(pieceToMove + 4).getFirst(),
+                                getArrIndex(pieceToMove + 4).getSecond());
+                //get index of first space a black man can jump to.
+                CustomIndex secondMove = new CustomIndex(getArrIndex(pieceToMove + 7).getFirst(),
+                                getArrIndex(pieceToMove + 7).getSecond());
+
+                //get index of first alt diagnal black man can move.
+                CustomIndex altMove1 = new CustomIndex(getArrIndex(pieceToMove + 5).getFirst(),
+                                getArrIndex(pieceToMove + 5).getSecond());
+
+                //get index of first  alt jump black man can make.
+                CustomIndex altMove2 = new CustomIndex(getArrIndex(pieceToMove + 9).getFirst(),
+                                getArrIndex(pieceToMove + 9).getSecond());
+
+                //get characters from the customIndex objects.
+                char bMove1 = board[firstMove.getFirst()][firstMove.getSecond()];
+                char bMove2 = board[secondMove.getFirst()][secondMove.getSecond()];
+                char bAlt1 = board[altMove1.getFirst()][altMove1.getSecond()];
+                char bAlt2 = board[altMove2.getFirst()][altMove2.getSecond()];
+
+                if(bMove1 != ' ' && (bMove1 != toMan(currentPiece) && bMove1 != toKing(currentPiece))
+                        && origIndex.getSecond() != 6)
+                 {
+                     //is there an open spot to land on.
+                     if(bMove2 == ' '){
+                         return true;
+                     }
+                 }else if(bAlt1 != ' ' && (bAlt1 != toMan(currentPiece) && bAlt1 != toKing(currentPiece)) 
+                         && origIndex.getSecond() != 0)
+                 {
+                     if(bAlt2 == ' ')
+                     {
+                         return true;
+                     }
+                 }
+            }
+
+            if(currentPiece == '@')
+            {
+                if(pieceToMove - 9 >= 1)
+                {
+
+                    //get index of first diagnal move a black king can make.
+                    CustomIndex bKing1 = new CustomIndex(getArrIndex(pieceToMove - 3).getFirst(),
+                                    getArrIndex(pieceToMove - 3).getSecond());
+                    //get index of first space a black king can jump to.
+                    CustomIndex bKing2 = new CustomIndex(getArrIndex(pieceToMove - 7).getFirst(),
+                                    getArrIndex(pieceToMove - 7).getSecond());
+
+                    //get index of first alt diagnal black king can move.
+                    CustomIndex bKingAlt1 = new CustomIndex(getArrIndex(pieceToMove - 4).getFirst(),
+                                    getArrIndex(pieceToMove - 4).getSecond());
+
+                    //get index of first  alt jump black king can make.
+                    CustomIndex bKingAlt2 = new CustomIndex(getArrIndex(pieceToMove - 9).getFirst(),
+                                    getArrIndex(pieceToMove - 9).getSecond());
+
+                    //get characters from the customIndex objects.
+                    char bKingM1 = board[bKing1.getFirst()][bKing1.getSecond()];
+                    char bKingM2 = board[bKing2.getFirst()][bKing2.getSecond()];
+                    char bKingA1 = board[bKingAlt1.getFirst()][bKingAlt1.getSecond()];
+                    char bKingA2 = board[bKingAlt2.getFirst()][bKingAlt2.getSecond()];
+
+
+                    //checks to see if 1) piece will not jump off board 2) the piece is an enemy piece.
+                    if(bKingM1 != ' ' && (bKingM1 != toMan(currentPiece) && bKingM1 != toKing(currentPiece)) 
+                            && origIndex.getSecond() != 0)
+                    {
+                    //is there an open spot to land on.
+                    if(bKingM2 == ' '){
+                     return true;
+                    }
+                    }else if(bKingA1 != ' ' && (bKingA1 != toMan(currentPiece) && bKingA1 != toKing(currentPiece))
+                            && origIndex.getSecond() != 6)
+                    {
+                        if(bKingA2 == ' ')
+                        {
+                         return true;
+                        }
+                    }
+                }
+            
+            }
+            }
+        }
+        return false;
     }
+
     
     //take a board space number and convert it to a 2d array index.
     private CustomIndex getArrIndex(int value)
@@ -283,7 +587,7 @@ public class Board {
     }
     
     //Convert King back to man
-    public char toMan(){
+    public char toMan(char piece){
         if(piece == '@'){
             piece = 'O';
         }
